@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const config = require("./utils/config");
-const fs = require('fs');
+const { promises: fs } = require("fs");
 
 app.use(express.json())
 
@@ -30,8 +30,38 @@ let packages = [
   },
 ]
 
+const loadData = async () => {
+    try {
+        const data = await fs.readFile("dpkg-status.txt", "utf-8");
+        console.log("data", data)
+    } catch (error) {
+        console.log("data failed to load with error:", error)
+    }
+    
+}
+
+loadData();
+
+app.get('/api/data', (req, res) => {
+    if (data) {
+      res.json(data)
+    } else {
+      console.log("no packages listed in the provided file!") 
+      res.status(404).end()
+    }
+})
+
 app.get('/api/packages', (req, res) => {
-  if (notes.length >= 1) {
+  if (packages.length >= 1) {
+    res.json(packages)
+  } else {
+    console.log("no packages listed in the provided file!") 
+    res.status(404).end()
+  }
+})
+
+app.get('/api/packages', (req, res) => {
+  if (packages.length >= 1) {
     res.json(packages)
   } else {
     console.log("no packages listed in the provided file!") 
@@ -42,7 +72,7 @@ app.get('/api/packages', (req, res) => {
 // maybe use name instead of id for search? 
 app.get('/api/packages/:id', (req, res) => {
   const id = Number(req.params.id)
-  const note = packages.find(package => package.id === id)
+  const package = packages.find(package => package.id === id)
   if (package) {
     res.json(package)
   } else {
