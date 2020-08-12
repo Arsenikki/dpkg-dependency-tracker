@@ -17,11 +17,11 @@ let packages = [
     // ]
   },
   {
-    name: "adduser",
-    description: "add and remove users and groups",
-    dependsOn: [
+    Package: "adduser",
+    Depends: [
         "passwd", "debconf | debconf-2.0", "libc6" // if pipe, store the one found from names. 
     ],
+    Description: "add and remove users and groups",
   },
 ];
 
@@ -30,7 +30,7 @@ let alternativeDependencyList = [];
 const loadFile = async (filepath) => {
     try {
         console.log("Loading data to memory from:", filepath)
-        var rawdata = await fs.readFile(filepath, "utf-8")
+        var rawdata = fs.readFile(filepath, "utf-8")
     } catch (error) {
         console.log("data failed to load with error:", error)
     }
@@ -49,9 +49,10 @@ const splitAndRegexDependencies = (input) => {
         // regex magic to remove the version tag.
         dependency = dependency.replace(/ *\([^)]*\) */g, "");
 
-        // Save all dependency alternatives together marked by pipe character.
+        // Save separately dependency alternatives marked by pipe character.
         if (dependency.includes("|")) {
-          alternativeDependencyList.push(dependency)
+          depForComparison = dependency.split("|").map(dep => dep.trim());
+          alternativeDependencyList.push(depForComparison)
         }
     }) 
     return dependencies
@@ -93,14 +94,35 @@ const dataParser = async (rawdata) => {
     
 }
 
+const alternativeDependencyComparer = async () => {
+  // Compare similar alternatives together i.e. gpgv | gpgv2 | gpgv1
+  alternativeDependencyList.forEach( alternatives => {
+    i = 0
+    // Select the alternative, which is already listed as a package.
+    // Use while loop to be able to exit early
+    while(alternatives[i]) {
+      let found = packages.find(package => package.Package === alternatives[i])
+      if(typeof found !== "undefined") {
+        console.log("selected package:", found.Package, "from multiple alternatives")
+        break;
+      }
+      i++;
+    }  
+  })
+}
+
 const fileProcessor = async () => {
     // Load the dpkg-status file to memory.
     let filepath = "./backend/data/dpkg-status.txt"
     let rawdata = await loadFile(filepath);
 
     // Parse and save the data.
-    let parsedData = await dataParser(rawdata)
+    await dataParser(rawdata)
+
+    // Compare stored alternative dependencies 
+    await alternativeDependencyComparer()
 }
+
 fileProcessor();
 
 app.get('/api/data', (req, res) => {
