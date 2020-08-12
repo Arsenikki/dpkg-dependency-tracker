@@ -7,40 +7,69 @@ app.use(express.json())
 
 let packages = [
   {
-    id: 1,
-    name: "accountsservice",
-    description: "query and manipulate user account information",
-    dependsOn: [
+    Package: "accountsservice",
+    Depends: [
         "dbus", "libaccountsservice", "libc6", "libglib2.0-0", "libpolkit-gobject-1-0"
     ],
-    isDependencyFor: [
-        "language-selector-common"
-    ]
+    Description: "query and manipulate user account information",
+    // isDependencyFor: [
+    //    "language-selector-common"
+    // ]
   },
   {
-    id: 2,
     name: "adduser",
     description: "add and remove users and groups",
     dependsOn: [
         "passwd", "debconf | debconf-2.0", "libc6" // if pipe, store the one found from names. 
     ],
-    isDependencyFor: [
-        "language-selector-common"
-    ]
   },
-]
+];
 
-const loadData = async () => {
+const loadFile = async (filepath) => {
     try {
-        const data = await fs.readFile("dpkg-status.txt", "utf-8");
-        console.log("data", data)
+        console.log("Loading data to memory from:", filepath)
+        var rawdata = await fs.readFile(filepath, "utf-8")
     } catch (error) {
         console.log("data failed to load with error:", error)
     }
+    return rawdata;
+}
+
+const dataParser = async (rawdata) => {
+    // split data into an array of separate packages.
+    let separatePackages = rawdata.split("\n\n");
+
+    separatePackages.forEach(package => {
+        let allVariables = package.split("\n")
+        let valuesToParse = ["Package", "Depends", "Description"]
+        let valueObject = {};
+
+        
+        valuesToParse.forEach( wv => {
+            let entry = allVariables.filter( element => element.includes(wv)).flat();
+            entry = entry[0]
+
+            // Store the value of each key in an object.
+            if (typeof entry !== "undefined") {
+                valueObject[wv] = entry.replace(wv + ": ", "")
+            }
+        })
+
+        // Add the object to the packages array.
+        packages.push(valueObject);
+    });
     
 }
 
-loadData();
+const fileProcessor = async () => {
+    // Load the dpkg-status file to memory.
+    let filepath = "./backend/data/dpkg-status.txt"
+    let rawdata = await loadFile(filepath);
+
+    // Parse and save the data.
+    let parsedData = await dataParser(rawdata)
+}
+fileProcessor();
 
 app.get('/api/data', (req, res) => {
     if (data) {
