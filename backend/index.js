@@ -25,6 +25,8 @@ let packages = [
   },
 ];
 
+let alternativeDependencyList = [];
+
 const loadFile = async (filepath) => {
     try {
         console.log("Loading data to memory from:", filepath)
@@ -35,24 +37,54 @@ const loadFile = async (filepath) => {
     return rawdata;
 }
 
+const parseOnlyValueFromString = (fullString, stringToRemove) => {
+    return fullString.replace(stringToRemove + ": ", "")
+}
+
+
+
+const splitAndRegexDependencies = (input) => {
+    input = input.split(", ")
+    let dependencies = input.map(dependency => {
+        // regex magic to remove the version tag.
+        dependency = dependency.replace(/ *\([^)]*\) */g, "");
+
+        // Save all dependency alternatives together marked by pipe character.
+        if (dependency.includes("|")) {
+          alternativeDependencyList.push(dependency)
+        }
+    }) 
+    return dependencies
+}
+
+
 const dataParser = async (rawdata) => {
     // split data into an array of separate packages.
     let separatePackages = rawdata.split("\n\n");
 
     separatePackages.forEach(package => {
         let allVariables = package.split("\n")
-        let valuesToParse = ["Package", "Depends", "Description"]
+        let keysToParse = ["Package", "Depends", "Description"]
         let valueObject = {};
 
+        console.log("currently processing: ", allVariables[0])
         
-        valuesToParse.forEach( wv => {
-            let entry = allVariables.filter( element => element.includes(wv)).flat();
+        keysToParse.forEach( wantedKey => {
+            let entry = allVariables.filter( package => package.includes(wantedKey));
             entry = entry[0]
 
             // Store the value of each key in an object.
             if (typeof entry !== "undefined") {
-                valueObject[wv] = entry.replace(wv + ": ", "")
+                entry = parseOnlyValueFromString(entry, wantedKey)
+                
+                // Special treatment for the value to remove versions and extra dependencies (with pipe)
+                if (wantedKey === "Depends") {
+                    entry = splitAndRegexDependencies(entry)
+                }
             }
+
+            // Store value 
+            valueObject[wantedKey] = entry || ""
         })
 
         // Add the object to the packages array.
