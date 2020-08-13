@@ -7,11 +7,12 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Backend Debugger",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\backend\\index.js"
+            "program": "${workspaceFolder}\\backend\\index.js",
+            "cwd": "${workspaceFolder}\\backend"
         }
     ]
 }
