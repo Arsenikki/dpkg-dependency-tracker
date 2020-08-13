@@ -6,23 +6,23 @@ const { promises: fs } = require("fs");
 app.use(express.json())
 
 let packages = [
-  {
-    Package: "accountsservice",
-    Depends: [
-        "dbus", "libaccountsservice", "libc6", "libglib2.0-0", "libpolkit-gobject-1-0"
-    ],
-    Description: "query and manipulate user account information",
-    // isDependencyFor: [
-    //    "language-selector-common"
-    // ]
-  },
-  {
-    Package: "adduser",
-    Depends: [
-        "passwd", "debconf | debconf-2.0", "libc6" // if pipe, store the one found from names. 
-    ],
-    Description: "add and remove users and groups",
-  },
+  // {
+  //   Package: "accountsservice",
+  //   Depends: [
+  //       "dbus", "libaccountsservice", "libc6", "libglib2.0-0", "libpolkit-gobject-1-0"
+  //   ],
+  //   Description: "query and manipulate user account information",
+  //   // isDependencyFor: [
+  //   //    "language-selector-common"
+  //   // ]
+  // },
+  // {
+  //   Package: "adduser",
+  //   Depends: [
+  //       "passwd", "debconf | debconf-2.0", "libc6" // if pipe, store the one found from names. 
+  //   ],
+  //   Description: "add and remove users and groups",
+  // },
 ];
 
 let alternativeDependencyList = [];
@@ -43,7 +43,7 @@ const parseOnlyValueFromString = (fullString, stringToRemove) => {
 
 
 
-const splitAndRegexDependencies = (input) => {
+const splitAndRegexDependencies = (input, index) => {
     input = input.split(", ")
     let dependencies = input.map(dependency => {
         // regex magic to remove the version tag.
@@ -52,8 +52,12 @@ const splitAndRegexDependencies = (input) => {
         // Save separately dependency alternatives marked by pipe character.
         if (dependency.includes("|")) {
           depForComparison = dependency.split("|").map(dep => dep.trim());
-          alternativeDependencyList.push(depForComparison)
+          alternativeDependencyList.push({
+            "index": index,
+            "Depends" : depForComparison
+          })
         }
+        return dependency;
     }) 
     return dependencies
 }
@@ -62,6 +66,7 @@ const splitAndRegexDependencies = (input) => {
 const dataParser = async (rawdata) => {
     // split data into an array of separate packages.
     let separatePackages = rawdata.split("\n\n");
+    let packageIndex = 0;
 
     separatePackages.forEach(package => {
         let allVariables = package.split("\n")
@@ -80,34 +85,45 @@ const dataParser = async (rawdata) => {
                 
                 // Special treatment for the value to remove versions and extra dependencies (with pipe)
                 if (wantedKey === "Depends") {
-                    entry = splitAndRegexDependencies(entry)
+                    entry = splitAndRegexDependencies(entry, packageIndex)
                 }
             }
 
             // Store value 
-            valueObject[wantedKey] = entry || ""
+            valueObject[wantedKey] = entry
         })
 
         // Add the object to the packages array.
-        packages.push(valueObject);
+        packages.push(valueObject) || null;
+        packageIndex++;
     });
     
 }
 
+overwriteUnnecessaryAlternatives = async (packageName, packageIndex) => {
+  let depIndex = packages[packageIndex]?.Depends?.findIndex(dep => dep?.includes(packageName))
+  if (depIndex !== -1 && typeof depIndex !== "undefined") {
+    packages[packageIndex].Depends[depIndex] = packageName
+  }
+};
+
 const alternativeDependencyComparer = async () => {
+  let i = 0
   // Compare similar alternatives together i.e. gpgv | gpgv2 | gpgv1
   alternativeDependencyList.forEach( alternatives => {
-    i = 0
+    let j = 0
     // Select the alternative, which is already listed as a package.
     // Use while loop to be able to exit early
-    while(alternatives[i]) {
-      let found = packages.find(package => package.Package === alternatives[i])
+    while(alternatives.Depends[j]) {
+      let found = packages.find(package => package.Package === alternatives.Depends[j])
       if(typeof found !== "undefined") {
         console.log("selected package:", found.Package, "from multiple alternatives")
+        overwriteUnnecessaryAlternatives(found.Package, i)
         break;
       }
-      i++;
+      j++;
     }  
+    i++;
   })
 }
 
