@@ -1,7 +1,6 @@
+const packagesRouter = require("express").Router();
 
-app.use(express.json())
-
-app.get('/api/packages', (req, res) => {
+packagesRouter.get('/', (req, res) => {
     if (packages.length >= 1) {
       res.json(packages)
     } else {
@@ -11,7 +10,7 @@ app.get('/api/packages', (req, res) => {
 })
   
 // maybe use name instead of id for search? 
-app.get('/api/packages/:name', (req, res) => {
+packagesRouter.get('/:name', (req, res) => {
     const id = Number(req.params.id)
     const package = packages.find(package => package.id === id)
     if (package) {
@@ -21,3 +20,5 @@ app.get('/api/packages/:name', (req, res) => {
         res.status(404).end()
     }
 })
+
+module.exports = packagesRouter;

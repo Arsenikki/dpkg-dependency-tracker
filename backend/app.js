@@ -1,6 +1,5 @@
 const { promises: fs } = require("fs");
 
-
 let packages = [
 ];
 
@@ -53,8 +52,6 @@ const dataParser = async (rawdata) => {
 
         let keysToParse = ["Package", "Depends", "Description", "DependencyFor"]
         let valueObject = {};
-
-        console.log("currently processing: ", allVariables[0])
         
         keysToParse.forEach( key => {
             let entry = allVariables.filter( package => package.includes(key));
@@ -98,7 +95,6 @@ const alternativeDependencyComparer = async () => {
     while(alternatives.Depends[j]) {
       let found = packages.find(package => package.Package === alternatives.Depends[j])
       if(typeof found !== "undefined") {
-        console.log("selected package:", found.Package, "from multiple alternatives")
         overwriteUnnecessaryAlternatives(found.Package, i)
         break;
       }
@@ -153,4 +149,6 @@ const fileProcessor = async () => {
     console.timeEnd('File processing');
 }
 
-fileProcessor();
+module.exports = {
+    fileProcessor  
+}
