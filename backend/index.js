@@ -6,23 +6,6 @@ const { promises: fs } = require("fs");
 app.use(express.json())
 
 let packages = [
-  // {
-  //   Package: "accountsservice",
-  //   Depends: [
-  //       "dbus", "libaccountsservice", "libc6", "libglib2.0-0", "libpolkit-gobject-1-0"
-  //   ],
-  //   Description: "query and manipulate user account information",
-  //   // isDependencyFor: [
-  //   //    "language-selector-common"
-  //   // ]
-  // },
-  // {
-  //   Package: "adduser",
-  //   Depends: [
-  //       "passwd", "debconf | debconf-2.0", "libc6" // if pipe, store the one found from names. 
-  //   ],
-  //   Description: "add and remove users and groups",
-  // },
 ];
 
 let alternativeDependencyList = [];
@@ -59,7 +42,8 @@ const splitAndRegexDependencies = (input, index) => {
         }
         return dependency;
     }) 
-    return dependencies
+    // filter duplicates
+    return dependencies.filter((dep, index) => dependencies.indexOf(dep) === index ) 
 }
 
 
@@ -70,27 +54,28 @@ const dataParser = async (rawdata) => {
 
     separatePackages.forEach(package => {
         let allVariables = package.split("\n")
-        let keysToParse = ["Package", "Depends", "Description"]
+
+        let keysToParse = ["Package", "Depends", "Description", "DependencyFor"]
         let valueObject = {};
 
         console.log("currently processing: ", allVariables[0])
         
-        keysToParse.forEach( wantedKey => {
-            let entry = allVariables.filter( package => package.includes(wantedKey));
+        keysToParse.forEach( key => {
+            let entry = allVariables.filter( package => package.includes(key));
             entry = entry[0]
 
             // Store the value of each key in an object.
             if (typeof entry !== "undefined") {
-                entry = parseOnlyValueFromString(entry, wantedKey)
+                entry = parseOnlyValueFromString(entry, key)
                 
                 // Special treatment for the value to remove versions and extra dependencies (with pipe)
-                if (wantedKey === "Depends") {
+                if (key === "Depends") {
                     entry = splitAndRegexDependencies(entry, packageIndex)
                 }
             }
 
             // Store value 
-            valueObject[wantedKey] = entry
+            valueObject[key] = entry || []
         })
 
         // Add the object to the packages array.
@@ -127,9 +112,34 @@ const alternativeDependencyComparer = async () => {
   })
 }
 
+const addRelationsToDependencies = async () => {
+  let index = 0
+  let i = 0
+  while(i < packages.length) {
+    let j = 0
+    while(j < packages[i].Depends?.length) {
+      let k = 0
+      while(k < packages.length) {
+        let childPkg = packages[i].Package
+        let parentPkg = packages[i].Depends[j]
+
+        if (packages[k].Package === parentPkg) {
+          packages[k].DependencyFor.push(childPkg)
+        }
+        k++;
+      }
+      j++;
+    }
+    i++;
+  }
+}
+
 const fileProcessor = async () => {
+    // Start timer
+    console.time('File processing');
+
     // Load the dpkg-status file to memory.
-    let filepath = "./backend/data/dpkg-status.txt"
+    let filepath = "./data/dpkg-status.txt"
     let rawdata = await loadFile(filepath);
 
     // Parse and save the data.
@@ -137,27 +147,17 @@ const fileProcessor = async () => {
 
     // Compare stored alternative dependencies 
     await alternativeDependencyComparer()
+    
+
+    // Find relational dependencies
+    await addRelationsToDependencies()
+
+    // count amount of packages listed and stop timer
+    console.log(`Proccessing of ${packages.length} packages finished.`)
+    console.timeEnd('File processing');
 }
 
 fileProcessor();
-
-app.get('/api/data', (req, res) => {
-    if (data) {
-      res.json(data)
-    } else {
-      console.log("no packages listed in the provided file!") 
-      res.status(404).end()
-    }
-})
-
-app.get('/api/packages', (req, res) => {
-  if (packages.length >= 1) {
-    res.json(packages)
-  } else {
-    console.log("no packages listed in the provided file!") 
-    res.status(404).end()
-  }
-})
 
 app.get('/api/packages', (req, res) => {
   if (packages.length >= 1) {
@@ -169,7 +169,7 @@ app.get('/api/packages', (req, res) => {
 })
 
 // maybe use name instead of id for search? 
-app.get('/api/packages/:id', (req, res) => {
+app.get('/api/packages/:name', (req, res) => {
   const id = Number(req.params.id)
   const package = packages.find(package => package.id === id)
   if (package) {
