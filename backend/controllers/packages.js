@@ -1,4 +1,5 @@
 const packagesRouter = require("express").Router();
+const { packages } = require('.././app');
 
 packagesRouter.get('/', (req, res) => {
     if (packages.length >= 1) {

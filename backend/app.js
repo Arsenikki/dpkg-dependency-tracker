@@ -150,5 +150,6 @@ const fileProcessor = async () => {
 }
 
 module.exports = {
-    fileProcessor  
+    fileProcessor,
+    packages 
 }
