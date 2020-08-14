@@ -1,0 +1,26 @@
+{
+  "name": "learn-starter",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "build:css": "postcss styles/tailwind.css -o styles/app.css",
+    "watch:css": "postcss styles/tailwind.css -o styles/app.css -w"
+  },
+  "dependencies": {
+    "autoprefixer": "^9.8.6",
+    "fetch": "^1.1.0",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "9.3.5",
+    "postcss": "^7.0.32",
+    "postcss-cli": "^7.1.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
+  },
+  "devDependencies": {
+    "postcss-preset-env": "^6.7.0",
+    "tailwindcss": "^1.6.2"
+  }
+}
