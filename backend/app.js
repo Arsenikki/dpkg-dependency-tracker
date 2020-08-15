@@ -41,6 +41,31 @@ const splitAndRegexDependencies = (input, index) => {
     return dependencies.filter((dep, index) => dependencies.indexOf(dep) === index ) 
 }
 
+const joinMultilineDescriptions = (properties) => {
+  // Find the row where to start parsing
+  let startRow = properties.findIndex(prop => prop.includes("Description:"))
+
+  for (let i = startRow + 1 ; i < properties.length; i++) {
+    if (properties[i].includes("-")) {
+      properties[i] = properties[i].replace(" - ", "  \n\u2022 ");
+    }
+
+    if (properties[i].includes("*")) {
+      properties[i] = properties[i].replace(" * ", "  \n\u2022 ");
+    }
+
+    if (properties[i].startsWith(" .")) {
+      properties[startRow] = properties[startRow] + "\n"
+    } 
+    else if (properties[i].startsWith(" ")) {
+      properties[startRow] = properties[startRow] + properties[i]
+    } else {
+      break;
+    }
+  }
+  return properties
+}
+
 
 const dataParser = async (rawdata) => {
     // split data into an array of separate packages.
@@ -48,20 +73,23 @@ const dataParser = async (rawdata) => {
     let packageIndex = 0;
 
     separatePackages.forEach(package => {
-        let allVariables = package.split("\n")
+        let properties = package.split("\n")
 
-        let keysToParse = ["Package", "Depends", "Description", "DependencyFor"]
+        properties = joinMultilineDescriptions(properties);
+
+        let keysToFind = ["Package", "Depends", "Description", "DependencyFor"]
         let valueObject = {};
         
-        keysToParse.forEach( key => {
-            let entry = allVariables.filter( package => package.includes(key));
+        keysToFind.forEach( key => {
+            let entry = properties.filter( package => package.includes(key));
             entry = entry[0]
 
             // Store the value of each key in an object.
             if (typeof entry !== "undefined") {
                 entry = parseOnlyValueFromString(entry, key)
                 
-                // Special treatment for the value to remove versions and extra dependencies (with pipe)
+                // Special treatment for the dependencies to remove versions and
+                // to find the correct alternative
                 if (key === "Depends") {
                     entry = splitAndRegexDependencies(entry, packageIndex)
                 }
