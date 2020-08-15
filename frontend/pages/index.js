@@ -35,7 +35,7 @@ const Home = ({packages}) => {
                 {selectedPkg.Package}
               </p>
               <p class="pt-8 font-bold">Description:</p>
-              <p class="py-3">
+              <p class="py-3 whitespace-pre-line">
               {selectedPkg.Description}
               </p>
               <p class="pt-8 font-bold">Dependencies:</p>
