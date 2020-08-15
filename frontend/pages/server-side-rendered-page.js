@@ -23,7 +23,7 @@ const Home = ({packages}) => {
       </Head>
       <NavigationBar/>
 
-      <div class="flex flex-row py-6 px-2 pt-20 text-lg bg-gray-800">
+      <div class="flex flex-row py-6 px-6 pt-20 text-lg bg-gray-800">
         <div class="p-6 w-4/12 min-w-sm max-w-md">
           {packages.map((pkg) => (
             <div key={pkg.Package} class="mb-4 bg-gray-100 rounded shadow-md text-center">
@@ -38,7 +38,7 @@ const Home = ({packages}) => {
         {selectedPkg ? (
             <div class="p-6 w-full">
                 <div class="w-full p-8 sticky top-6 bg-gray-100 rounded shadow-md border border-gray-400 z-0">
-                    <p class="text-center text-3xl m-4 pb-6 font-bold ">
+                    <p class="text-center text-3xl m-2 font-bold ">
                         {selectedPkg.Package}
                     </p>
                     <p class="pt-8 font-bold">Description:</p>
