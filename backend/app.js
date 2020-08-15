@@ -154,6 +154,11 @@ const addRelationsToDependencies = async () => {
   }
 }
 
+const packageSorter = () => {
+  packages = packages.sort((a,b) => a.Package.localeCompare(b.Package));
+}
+
+
 const fileProcessor = async () => {
     // Start timer
     console.time('File processing');
@@ -162,18 +167,20 @@ const fileProcessor = async () => {
     let filepath = "./data/dpkg-status.txt"
     let rawdata = await loadFile(filepath);
 
-    // Parse and save the data.
+    // Parse and process the data.
     await dataParser(rawdata)
 
     // Compare stored alternative dependencies 
     await alternativeDependencyComparer()
-    
 
     // Find relational dependencies
     await addRelationsToDependencies()
 
+    // Sort dependencies alphabetically 
+    await packageSorter();
+
     // count amount of packages listed and stop timer
-    console.log(`Proccessing of ${packages.length} packages finished.`)
+    console.log(`Finished processing ${packages.length} packages.`)
     console.timeEnd('File processing');
 }
 
