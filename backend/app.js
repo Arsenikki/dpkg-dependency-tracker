@@ -1,4 +1,5 @@
 const { promises: fs } = require("fs");
+const config = require("./utilities/config");
 
 let packages = [
 ];
@@ -164,7 +165,7 @@ const fileProcessor = async () => {
     console.time('File processing');
 
     // Load the dpkg-status file to memory.
-    let filepath = "./data/dpkg-status.txt"
+    let filepath = config.FILEPATH
     let rawdata = await loadFile(filepath);
 
     // Parse and process the data.
