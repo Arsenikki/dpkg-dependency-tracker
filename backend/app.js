@@ -25,12 +25,15 @@ const parseOnlyValueFromString = (fullString, stringToRemove) => {
 const splitAndRegexDependencies = (input, index) => {
     input = input.split(", ")
     let dependencies = input.map(dependency => {
-        // regex magic to remove the version tag.
+        
+        // regex magic to remove the white spaces
+        dependency = dependency.replace(/\s/g, "");
+        // some more to remove version tags
         dependency = dependency.replace(/ *\([^)]*\) */g, "");
 
         // Save separately dependency alternatives marked by pipe character.
         if (dependency.includes("|")) {
-          depForComparison = dependency.split("|").map(dep => dep.trim());
+          depForComparison = dependency.split("|")
           alternativeDependencyList.push({
             "index": index,
             "Depends" : depForComparison
@@ -156,7 +159,12 @@ const addRelationsToDependencies = async () => {
 }
 
 const packageSorter = () => {
-  packages = packages.sort((a,b) => a.Package.localeCompare(b.Package));
+  packages = packages.sort((a,b) => {a.Package.localeCompare(b.Package)}); 
+  
+  packages.forEach((pkg, index) => {
+    packages[index].Depends = pkg.Depends.sort((a,b) => a.localeCompare(b))
+    packages[index].DependencyFor = pkg.DependencyFor.sort((a,b) => a.localeCompare(b))
+  })
 }
 
 
