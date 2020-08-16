@@ -12,7 +12,11 @@ const Home = ({packages}) => {
   }
 
   const handleDependencyClick = (e) => {
-    console.log("asd", e)
+      let a = e.target.textContent
+      console.log("##############", a)
+      let b = packages.find(pkg => pkg.Package === e.target.textContent)
+      console.log("!!!!!!!!!!!!!!", b)
+      setSelectedPkg(b)
   }
 
   return (
@@ -25,8 +29,8 @@ const Home = ({packages}) => {
 
       <div class="flex flex-row py-6 px-6 pt-20 text-lg bg-gray-800">
         <div class="p-6 w-4/12 min-w-sm max-w-md">
-          {packages.map((pkg) => (
-            <div key={pkg.Package} class="mb-4 bg-gray-100 rounded shadow-md text-center">
+          {packages.map((pkg, index) => (
+            <div key={index} class="mb-4 bg-gray-100 rounded shadow-md text-center">
                 <button onClick={() => handleSelectPkg(pkg)}
                     class="rounded font-bold truncate w-full whitespace-no-wrap hover:bg-gray-300 focus:bg-gray-400 focus:outline-none border border-gray-400">
                     {pkg.Package}
@@ -46,17 +50,17 @@ const Home = ({packages}) => {
                     {selectedPkg.Description}
                     </p>
                     <p class="pt-8 font-bold">Dependencies:</p>
-                    {selectedPkg.Depends.map((dep) => (
-                        <li key={dep.Packages}
+                    {selectedPkg.Depends.map((dep, index) => (
+                        <li key={index}
                             onClick = {(e) => handleDependencyClick(e)} 
                             class="ml-4">
                             {dep}
                         </li>
                     ))}  
                     <p class="pt-8 font-bold">Used by:</p>
-                    {selectedPkg.DependencyFor.map((dep) => (
-                        <li key={dep.Packages} 
-                            onClick = {(e) => handleDependencyClick(e)} 
+                    {selectedPkg.DependencyFor.map((dep, index) => (
+                        <li key={index} 
+                            onClick = {(e) => handleDependencyClick(e)}
                             class="ml-4">
                             {dep}
                         </li>
