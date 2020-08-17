@@ -1,25 +1,25 @@
-require("dotenv").config();
-const fs = require('fs')
+const fs = require('fs');
 
-let userPath = "./data/user-dpkg-data.txt"
-let examplePath = "./data/example-dpkg-data.txt"
+require('dotenv').config();
+
+const userPath = './data/user-dpkg-data.txt';
+const examplePath = './data/example-dpkg-data.txt';
 
 const checkUserFileExistance = () => {
   if (fs.existsSync(userPath)) {
-    console.log("Found the user provided dpkg file")
-    return true
-  } else {
-    console.log("No user dpkg file found, using the example file")
-    return false;
+    console.log('Found the user provided dpkg file');
+    return true;
   }
-}
+  console.log('No user dpkg file found, using the example file');
+  return false;
+};
 
-// Use user file if it's provided, else use example file. 
-let FILEPATH = checkUserFileExistance() ? userPath : examplePath
+// Use user file if it's provided, else use example file.
+const FILEPATH = checkUserFileExistance() ? userPath : examplePath;
 
-let PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 module.exports = {
   FILEPATH,
-  PORT
-}
+  PORT,
+};
