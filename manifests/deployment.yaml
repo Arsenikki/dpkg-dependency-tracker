@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpkg-backend
+spec:
+  selector:
+    matchLabels:
+      app: dpkg-backend
+  template:
+    metadata:
+      labels:
+        app: dpkg-backend
+    spec:
+      containers:
+      - name: dpkg-backend
+        image: arsenikki/dpkg-dep-tracker-backend:1.0.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpkg-frontend
+spec:
+  selector:
+    matchLabels:
+      app: dpkg-frontend
+  template:
+    metadata:
+      labels:
+        app: dpkg-frontend
+    spec:
+      containers:
+      - name: dpkg-frontend
+        image: arsenikki/dpkg-dep-tracker-frontend:1.0.4-prod
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpkg-static-test
+spec:
+  selector:
+    matchLabels:
+      app: dpkg-static-test
+  template:
+    metadata:
+      labels:
+        app: dpkg-static-test
+    spec:
+      containers:
+      - name: dpkg-static-test
+        image: arsenikki/static-html-dpkg:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+---

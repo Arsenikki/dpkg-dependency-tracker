@@ -1,5 +1,7 @@
 # Ignore these
 node_modules
+# .next
+# pages/static-generated-page.js
 
 ## Exceptions
 !data/example-dpkg-data.txt

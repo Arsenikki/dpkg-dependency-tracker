@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt
+    traefik.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  tls:
+    - hosts:
+        - untappiappi.westeurope.cloudapp.azure.com
+      secretName: tls-secret
+  rules:
+    - http:
+        paths:
+        - path: /dpkg/api/
+          backend:
+            serviceName: dpkg-backend-clusterip
+            servicePort: 5000    
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: front-test-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt
+    traefik.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  tls:
+    - hosts:
+        - untappiappi.westeurope.cloudapp.azure.com
+      secretName: tls-secret
+  rules:
+    - http:
+        paths:
+          - path: /dpkg/
+            backend:
+              serviceName: dpkg-frontend-clusterip
+              servicePort: 3000
+
+
+            
