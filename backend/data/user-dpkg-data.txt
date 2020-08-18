@@ -6,7 +6,7 @@ Installed-Size: 452
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Architecture: amd64
 Version: 0.6.55-0ubuntu12~20.04.1
-Depends: dbus, libaccountsservice0 (= 0.6.55-0ubuntu12~20.04.1), libc6 (>= 2.4), libglib2.0-0 (>= 2.44), libpolkit-gobject-1-0 (>= 0.99)
+Depends: dbus | libaccountsservice0 (= 0.6.55-0ubuntu12~20.04.1), libc6 (>= 2.4), libglib2.0-0 (>= 2.44), libpolkit-gobject-1-0 (>= 0.99)
 Suggests: gnome-control-center
 Conffiles:
  /etc/dbus-1/system.d/org.freedesktop.Accounts.conf 06247d62052029ead7d9ec1ef9457f42
@@ -16796,4 +16796,3 @@ Description: architecture independent files for Zsh
  architectures.
 Homepage: https://www.zsh.org/
 Original-Maintainer: Debian Zsh Maintainers <pkg-zsh-devel@lists.alioth.debian.org>
-

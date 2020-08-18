@@ -15,11 +15,11 @@ const checkUserFileExistance = () => {
 };
 
 // Use user file if it's provided, else use example file.
-const FILEPATH = checkUserFileExistance() ? userPath : examplePath;
+const filePath = checkUserFileExistance() ? userPath : examplePath;
 
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
 module.exports = {
-  FILEPATH,
-  PORT,
+  filePath,
+  port,
 };
