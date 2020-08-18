@@ -37,7 +37,7 @@ const joinMultilineDescriptions = (separateLines) => {
   let descriptionStartedIndex;
 
   // Combine multiline description in one variable
-  const combinedDescriptionLine = separateLines.filter((line, index) => {
+  let combinedDescriptionLine = separateLines.filter((line, index) => {
     if (line.includes('Description')) {
       descriptionStartedIndex = index;
       return true;
@@ -49,16 +49,16 @@ const joinMultilineDescriptions = (separateLines) => {
   }).join('\n');
 
   // Replace unconsistent - and * usage for bullet points in description
-  if (combinedDescriptionLine.includes('-')) {
-    combinedDescriptionLine.replace(' - ', '  \n* ');
+  if (combinedDescriptionLine.includes(' - ')) {
+    combinedDescriptionLine = combinedDescriptionLine.replace(' - ', '  \n* ');
   }
 
-  if (combinedDescriptionLine.includes('*')) {
-    combinedDescriptionLine.replace(' * ', '  \n* ');
+  if (combinedDescriptionLine.includes(' * ')) {
+    combinedDescriptionLine = combinedDescriptionLine.replace(' * ', '  \n* ');
   }
 
-  if (combinedDescriptionLine.includes(' .')) {
-    combinedDescriptionLine.replace(' .', ' \n');
+  if (combinedDescriptionLine.includes('.\n')) {
+    combinedDescriptionLine = combinedDescriptionLine.replace('.\n', '\n');
   }
   separateLines[descriptionStartedIndex] = combinedDescriptionLine;
   return separateLines;
