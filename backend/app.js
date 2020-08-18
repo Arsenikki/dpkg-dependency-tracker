@@ -98,7 +98,7 @@ const alternativeDependencyComparer = (parsedPackages) => {
     const singlePkgNoAlt = pkg.Depends?.map((dep) => {
       if (dep.includes('|')) {
         const separatedAlts = dep.split('|');
-        // Find which one is good and return it
+        // Find which one is found in package list and return it
         const correctAltDep = findTheRightAlternative(separatedAlts, parsedPackages);
         return correctAltDep;
       }
@@ -109,8 +109,16 @@ const alternativeDependencyComparer = (parsedPackages) => {
   return PkgsWithNoAlts;
 };
 
-const addRelationsToDependencies = () => {
-  console.log('do this');
+const findReverseDependency = (pkgName, pkgs) => pkgs.reduce((array, pkg) => ((pkg.Depends.some((dep) => dep === pkgName))
+  ? [...array, pkg.Package]
+  : array), []);
+
+const addReverseDependencies = (allPkgs) => {
+  const pkgsWithRelationspkgs = allPkgs.map((pkgToFind) => {
+    const relationsToAdd = findReverseDependency(pkgToFind.Package, allPkgs);
+    return { ...pkgToFind, DependencyFor: relationsToAdd || [] };
+  });
+  return pkgsWithRelationspkgs;
 };
 
 const packageSorter = () => {
