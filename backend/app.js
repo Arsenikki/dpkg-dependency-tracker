@@ -90,15 +90,7 @@ const dataParser = (rawdata) => {
   return packages;
 };
 
-// TODO: poista turhat setit
-const findTheRightAlternative = (alts, allPkgs) => {
-  const jabba = alts.find((alt) => {
-    const asd = allPkgs.some((pkg) => pkg.Package === alt);
-    console.log(asd);
-    return asd;
-  });
-  return jabba;
-};
+const findTheRightAlternative = (alts, allPkgs) => alts.find((alt) => allPkgs.some((pkg) => pkg.Package === alt));
 
 const alternativeDependencyComparer = (parsedPackages) => {
   // Compare similar alternatives together i.e. gpgv | gpgv2 | gpgv1
@@ -108,7 +100,6 @@ const alternativeDependencyComparer = (parsedPackages) => {
         const separatedAlts = dep.split('|');
         // Find which one is good and return it
         const correctAltDep = findTheRightAlternative(separatedAlts, parsedPackages);
-        console.log('compared:', { separatedAlts }, 'correct;', correctAltDep);
         return correctAltDep;
       }
       return dep;
