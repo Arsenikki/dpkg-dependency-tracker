@@ -1,26 +1,35 @@
 const packagesRouter = require('express').Router();
-const { packages } = require('../app');
+const multer = require('multer');
+const { fileProcessor } = require('../fileProcessor');
 
-packagesRouter.get('/', (req, res) => {
+const storageSettings = multer.diskStorage({
+  destination: './storage/',
+  filename(req, file, cb) {
+    cb(null, `${file.originalname}`);
+  },
+});
+
+// Save to /storage and limit filesize to 2 Mb
+const upload = multer({ dest: 'storage/', limits: { fileSize: 2000000 }, storage: storageSettings });
+
+// upload file
+packagesRouter.post('/upload', upload.single('dpkg-file'), async (req, res) => {
+  res.send('File upload successful');
+});
+
+// get file content
+packagesRouter.get('/load/:fileName', async (req, res) => {
+  const fileName = String(req.params.fileName);
+  const packages = await fileProcessor(fileName);
   if (packages.length >= 1) {
-    console.log('here you go, take some packages');
     res.json(packages);
   } else {
-    console.log('no packages listed in the provided file!');
-    res.status(404).end();
+    res.send('No packages ');
   }
 });
 
-// maybe use name instead of id for search?
-packagesRouter.get('/:name', (req, res) => {
-  const id = Number(req.params.id);
-  const pkgs = packages.find((pkg) => pkg.id === id);
-  if (pkgs) {
-    res.json(pkgs);
-  } else {
-    console.log(`No package found with id: ${id}`);
-    res.status(404).end();
-  }
+packagesRouter.get('/ping', (req, res) => {
+  res.send('Still alive');
 });
 
 module.exports = packagesRouter;
