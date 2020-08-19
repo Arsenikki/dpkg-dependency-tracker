@@ -7,7 +7,7 @@ services:
     container_name: dpkg-dep-tracker-backend
     restart: always
     volumes:
-      - "./backend/data:/data/"
+      - "./backend/storage:/storage/"
       
   frontend:
     image: arsenikki/dpkg-dep-tracker-frontend:1.0.4
