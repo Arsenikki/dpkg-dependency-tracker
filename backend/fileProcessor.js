@@ -1,18 +1,14 @@
 const { fileLoader } = require('./utilities/fileLoader');
-const { filePath } = require('./utilities/config');
 
 const alternativeDependencyList = [];
 
 const parseOnlyValueFromString = (fullString, stringToRemove) => fullString.replace(`${stringToRemove}: `, '');
 
 const splitAndRegexDependencies = (input, index) => {
-  // Split dependencies by ","
   const dependencies = input.split(', ');
-  let packageDependencies = dependencies.map((dependency) => {
-    // regex magic to remove white spaces
+  const packageDependencies = dependencies.map((dependency) => {
+    // regex magic to remove white spaces and version tags
     const depNoWhitespace = dependency.replace(/\s/g, '');
-
-    // some more to remove version tags
     const depNoVersiontag = depNoWhitespace.replace(/ *\([^)]*\) */g, '');
 
     // Save separately dependency alternatives marked by pipe character.
@@ -25,11 +21,7 @@ const splitAndRegexDependencies = (input, index) => {
     }
     return depNoVersiontag;
   });
-  // filter duplicate package dependencies
-  const filteredPackages = (packageDependencies = packageDependencies.filter(
-    (dep, idx) => packageDependencies.indexOf(dep) === idx,
-  ));
-  return filteredPackages;
+  return packageDependencies;
 };
 
 const joinMultilineDescriptions = (separateLines) => {
@@ -52,20 +44,18 @@ const joinMultilineDescriptions = (separateLines) => {
   if (combinedDescriptionLine.includes(' - ')) {
     combinedDescriptionLine = combinedDescriptionLine.replace(' - ', '  \n* ');
   }
-
   if (combinedDescriptionLine.includes(' * ')) {
     combinedDescriptionLine = combinedDescriptionLine.replace(' * ', '  \n* ');
   }
-
   if (combinedDescriptionLine.includes('.\n')) {
     combinedDescriptionLine = combinedDescriptionLine.replace('.\n', '\n');
   }
+
   separateLines[descriptionStartedIndex] = combinedDescriptionLine;
   return separateLines;
 };
 
 const dataParser = (rawdata) => {
-  // split data into an array of separate packages.
   const separatePackages = rawdata.split('\n\n');
   const packages = separatePackages.map((pkg, packageIndex) => {
     let linesOfPackage = pkg.split('\n');
@@ -86,19 +76,17 @@ const dataParser = (rawdata) => {
     };
     return linesOfPackage.reduce(lineParseReducer, {});
   });
-  console.log({ packages });
   return packages;
 };
 
+// Find which one is found in package list and return it
 const findTheRightAlternative = (alts, allPkgs) => alts.find((alt) => allPkgs.some((pkg) => pkg.Package === alt));
 
 const alternativeDependencyComparer = (parsedPackages) => {
-  // Compare similar alternatives together i.e. gpgv | gpgv2 | gpgv1
   const PkgsWithNoAlts = parsedPackages.map((pkg) => {
     const singlePkgNoAlt = pkg.Depends?.map((dep) => {
       if (dep.includes('|')) {
         const separatedAlts = dep.split('|');
-        // Find which one is found in package list and return it
         const correctAltDep = findTheRightAlternative(separatedAlts, parsedPackages);
         return correctAltDep;
       }
@@ -121,30 +109,32 @@ const addReverseDependencies = (allPkgs) => {
   return pkgsWithRelationspkgs;
 };
 
-const packageSorter = () => {
-  packages = [...new Set(packages.sort((a, b) => a.Package.localeCompare(b.Package)))];
-  packages.Depends = [...new Set(packages?.Depends.sort((a, b) => a.localeCompare(b)) || [])];
-  packages.DependencyFor = [...new Set(packages?.DependencyFor.sort((a, b) => a.localeCompare(b)) || [])];
+const packageSorter = (pkgsToSort) => {
+  const sortedPackages = [...new Set(pkgsToSort.sort((a, b) => a.Package.localeCompare(b.Package)))];
+  return sortedPackages.map((pkg) => {
+    const sortedDeps = [...new Set(pkg.Depends.sort((a, b) => a.localeCompare(b)))];
+    return { ...pkg, Depends: sortedDeps };
+  });
 };
 
-const fileProcessor = async () => {
+const fileProcessor = async (fileName) => {
   // Start timer
   console.time('File processing');
 
   // Load the dpkg-status file to memory.
-  const rawdata = await fileLoader(filePath);
+  const rawdata = await fileLoader(fileName);
 
   // Parse and process the data.
   const parsedPackages = dataParser(rawdata);
 
-  // Compare stored alternative dependencies
+  // Compare and sellect correct alternative i.e. gpgv | gpgv2 | gpgv1
   const dependencyCompared = alternativeDependencyComparer(parsedPackages);
 
   // Find reverse dependencies
-  const reverseDependencies = addRelationsToDependencies();
+  const reverseDependenciesAdded = addReverseDependencies(dependencyCompared);
 
   // Sort dependencies alphabetically and remove duplicates
-  const finalPackages = packageSorter(reverseDependencies);
+  const finalPackages = packageSorter(reverseDependenciesAdded);
 
   // count amount of packages listed and stop timer
   console.log(`Finished processing ${finalPackages.length} packages.`);
