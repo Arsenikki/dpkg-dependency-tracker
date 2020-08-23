@@ -1,16 +1,14 @@
 version: '3.7'
 services:
   backend:
-    image: arsenikki/dpkg-dep-tracker-backend:1.0.1
+    image: arsenikki/dpkg-dep-tracker-backend:1.0.3
     ports: 
       - 5000:5000
     container_name: dpkg-dep-tracker-backend
     restart: always
-    volumes:
-      - "./backend/storage:/storage/"
       
   frontend:
-    image: arsenikki/dpkg-dep-tracker-frontend:1.0.4
+    image: arsenikki/dpkg-dep-tracker-frontend:1.0.5
     ports: 
       - 3000:3000
     restart: always

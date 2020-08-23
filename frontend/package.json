@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "debug": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
     "export": "next export",
@@ -12,25 +13,20 @@
   },
   "dependencies": {
     "autoprefixer": "^9.8.6",
+    "cross-env": "^7.0.2",
     "fetch": "^1.1.0",
     "isomorphic-unfetch": "^3.0.0",
-    "next": "9.3.5",
+    "next": "9.5.2",
     "postcss": "^7.0.32",
     "postcss-cli": "^7.1.1",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "swr": "^0.3.1"
   },
   "devDependencies": {
     "eslint": "^7.7.0",
     "eslint-config-airbnb": "18.2.0",
-    "eslint-config-node": "^4.1.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "2.21.2",
-    "eslint-plugin-jsx-a11y": "6.3.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "7.20.0",
-    "eslint-plugin-react-hooks": "4.0.0",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.0.5",
     "tailwindcss": "^1.6.2"
