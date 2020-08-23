@@ -1,6 +1,6 @@
 const packagesRouter = require('express').Router();
 const multer = require('multer');
-const { fileProcessor } = require('../fileProcessor');
+const { dataProcessor } = require('../dataProcessor');
 
 const storageSettings = multer.diskStorage({
   destination: './storage/',
@@ -12,19 +12,23 @@ const storageSettings = multer.diskStorage({
 // Save to /storage and limit filesize to 2 Mb
 const upload = multer({ dest: 'storage/', limits: { fileSize: 2000000 }, storage: storageSettings });
 
-// upload file
+// Upload file to the server
 packagesRouter.post('/upload', upload.single('dpkg-file'), async (req, res) => {
-  res.send('File upload successful');
+  const userPackages = await dataProcessor(req.file.filename);
+  if (userPackages.length >= 1) {
+    res.json(userPackages);
+  } else {
+    res.send('Failed to process uploaded file:', req.file.filename);
+  }
 });
 
-// get file content
-packagesRouter.get('/load/:fileName', async (req, res) => {
-  const fileName = String(req.params.fileName);
-  const packages = await fileProcessor(fileName);
-  if (packages.length >= 1) {
-    res.json(packages);
+// Get package data from the server
+packagesRouter.get('/packages', async (req, res) => {
+  const defaultPackages = await dataProcessor();
+  if (defaultPackages.length >= 1) {
+    res.json(defaultPackages);
   } else {
-    res.send('No packages ');
+    res.send('No packages');
   }
 });
 
