@@ -5,19 +5,20 @@
 - [x] Finding & adding reverse dependencies
 - [x] API for getting packages + file upload
 - [x] Backend refactoring
-- [ ] Fixing small parse errors
+- [x] Fixing small parse errors
 
 ## Frontend 
 - [x] Showing list of packages
 - [x] Package details on selection
-- [ ] File Upload implementation
+- [x] File Upload implementation
+- [ ] Alerts for upload failure etc.
 
 ## Deployment
 - [x] Kubernetes deployed
-- [x] TLS configured
 - [x] Basic deployment
-- [ ] Ingress config for routing
-- [ ] Volume mount for file upload (needed?)
+- [x] Ingress config for routing
+- [ ] TLS configured
+- [ ] Scaling of frontend & backend
 
 ## General
 - [x] This TODO list
