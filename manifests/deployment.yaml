@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: dpkg-backend
-        image: arsenikki/dpkg-dep-tracker-backend:1.0.3
+        image: arsenikki/dpkg-viewer-backend:1.0.5
         imagePullPolicy: Always
         resources:
           limits:
@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
       - name: dpkg-frontend
-        image: arsenikki/dpkg-dep-tracker-frontend:1.0.7
+        image: arsenikki/dpkg-viewer-frontend:1.0.8
         imagePullPolicy: Always
         resources:
           limits:
@@ -45,28 +45,3 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 3000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dpkg-static-test
-spec:
-  selector:
-    matchLabels:
-      app: dpkg-static-test
-  template:
-    metadata:
-      labels:
-        app: dpkg-static-test
-    spec:
-      containers:
-      - name: dpkg-static-test
-        image: arsenikki/static-html-dpkg:latest
-        imagePullPolicy: Always
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 80
----
