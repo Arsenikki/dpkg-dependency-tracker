@@ -6,11 +6,11 @@ import Head from 'next/head';
 import PackageList from '../components/package-list';
 
 export default function Index({defaultPackages}) {
-  const [selectedPkg, setSelectedPkg] = useState(defaultPackages[0]);
   const [packages, setPackages] = useState(defaultPackages);
+  const [selectedPkg, setSelectedPkg] = useState(defaultPackages[0]);
 
   const handleChangePackages = (userPackages) => {
-    setSelectedPkg();
+    setSelectedPkg(userPackages[0]);
     setPackages(userPackages);
   }
   
