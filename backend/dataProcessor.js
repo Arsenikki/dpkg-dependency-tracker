@@ -53,7 +53,7 @@ const dataParser = (rawdata) => {
     const keysToFind = ['Package', 'Depends', 'Description', 'DependencyFor'];
 
     const lineParseReducer = (objBuilder, line) => {
-      const key = keysToFind.find(keyToFind => line.includes(`${keyToFind}: `));
+      const key = keysToFind.find(keyToFind => line.startsWith(`${keyToFind}: `));
       if (!key) return objBuilder;
 
       const entry = (key === 'Depends'
@@ -64,7 +64,7 @@ const dataParser = (rawdata) => {
     };
     return linesOfPackage.reduce(lineParseReducer, {});
   });
-  return packages;
+  return packages.filter(pkgObject => JSON.stringify(pkgObject) !== '{}');
 };
 
 const findReverseDependency = (pkgName, pkgs) => pkgs.reduce((array, pkg) => ((pkg.Depends?.some((dep) => dep === pkgName))
