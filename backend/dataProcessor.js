@@ -87,6 +87,20 @@ const packageSorter = (pkgsToSort) => {
     return { ...pkg, Depends: sortedDeps, DependencyFor: sortedReverseDeps };
   });
 };
+const addDependencyExistence = (dep, allPkgs) => {
+  const depExist = allPkgs.some((pkg) => pkg.Package === dep);
+  const depObject = {
+    name: dep,
+    existence: depExist,
+  };
+  return depObject;
+};
+
+const handleDependencyExistence = (allPkgs) => allPkgs.map((pkg) => {
+  const depsWithExistence = pkg.Depends?.map((basicDep) => addDependencyExistence(basicDep, allPkgs));
+  const reverseDepsWithExistence = pkg.DependencyFor?.map((revDep) => addDependencyExistence(revDep, allPkgs));
+  return { ...pkg, Depends: depsWithExistence, DependencyFor: reverseDepsWithExistence };
+});
 
 const dataProcessor = async (inputFile) => {
   // Start timer
@@ -96,19 +110,22 @@ const dataProcessor = async (inputFile) => {
   const rawdata = await fileLoader(inputFile);
 
   // Parse and process the data.
-  const parsedPackages = dataParser(rawdata);
+  const parsedPkgs = dataParser(rawdata);
 
   // Find reverse dependencies
-  const reverseDependenciesAdded = addReverseDependencies(parsedPackages);
+  const PkgsWithReverseDependencies = addReverseDependencies(parsedPkgs);
 
   // Sort dependencies alphabetically and remove duplicates
-  const finalPackages = packageSorter(reverseDependenciesAdded);
+  const PkgsSortedUnique = packageSorter(PkgsWithReverseDependencies);
+
+  // Add existence field to dependency objects
+  const PkgsWithFoundDeps = handleDependencyExistence(PkgsSortedUnique);
 
   // count amount of packages listed and stop timer
-  console.log(`Finished processing ${finalPackages.length} packages.`);
+  console.log(`Finished processing ${PkgsWithFoundDeps.length} packages.`);
   console.timeEnd('File processing');
 
-  return finalPackages;
+  return PkgsWithFoundDeps;
 };
 
 module.exports = {
