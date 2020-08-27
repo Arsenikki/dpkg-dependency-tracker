@@ -14,12 +14,12 @@ spec:
     spec:
       containers:
       - name: dpkg-backend
-        image: arsenikki/dpkg-viewer-backend:1.0.6
+        image: arsenikki/dpkg-viewer-backend:1.0.7
         imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
-            cpu: "50m"
+            cpu: "100m"
         ports:
         - containerPort: 5000
 --- 
@@ -39,11 +39,11 @@ spec:
     spec:
       containers:
       - name: dpkg-frontend
-        image: arsenikki/dpkg-viewer-frontend:1.1.0
+        image: arsenikki/dpkg-viewer-frontend:1.1.1
         imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
-            cpu: "50m"
+            cpu: "200m"
         ports:
         - containerPort: 3000
