@@ -1,5 +1,6 @@
 node_modules
 
-# Ignore all but example file
+# Ignore all but two example file
 storage/*
 !storage/example-dpkg-data.txt
+!storage/test-dpkg-data.txt
