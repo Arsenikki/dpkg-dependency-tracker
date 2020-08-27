@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: dpkg-backend
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: dpkg-backend
@@ -13,12 +14,12 @@ spec:
     spec:
       containers:
       - name: dpkg-backend
-        image: arsenikki/dpkg-viewer-backend:1.0.5
+        image: arsenikki/dpkg-viewer-backend:1.0.6
         imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "50m"
         ports:
         - containerPort: 5000
 --- 
@@ -27,6 +28,7 @@ kind: Deployment
 metadata:
   name: dpkg-frontend
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: dpkg-frontend
@@ -37,11 +39,11 @@ spec:
     spec:
       containers:
       - name: dpkg-frontend
-        image: arsenikki/dpkg-viewer-frontend:1.0.8
+        image: arsenikki/dpkg-viewer-frontend:1.1.0
         imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"
-            cpu: "500m"
+            cpu: "50m"
         ports:
         - containerPort: 3000
