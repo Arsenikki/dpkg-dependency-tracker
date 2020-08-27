@@ -43,6 +43,7 @@ My goal was to provide a simple user experience with a minimal amount of externa
 3. Select the wanted DPKG status file
 4. Upload & processing may take couple of seconds, as the cluster has relatively weak hardware
 5. The UI updates and the Debian package information is shown! :sunrise:
+6. Dependency buttons in blue are clickable, which takes user to that package. Dependencies not found in the package list are gray.  
 
 ### Run in a local environment with Docker
 1. Run `docker-compose up` from the project root folder
@@ -51,4 +52,5 @@ My goal was to provide a simple user experience with a minimal amount of externa
 5. Select the wanted DPKG status file
 6. Upload & processing should be almost instant (For me it takes ~120 ms for tested files)
 7. The UI updates and the Debian package information is shown! :sunrise:
-8. Close the application with `docker-compose down`
+8. Dependency buttons in blue are clickable, which takes user to that package. Dependencies not found in the package list are gray.
+9. Close the application with `docker-compose down`
