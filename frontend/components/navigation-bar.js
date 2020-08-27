@@ -27,7 +27,7 @@ export default function NavigationBar({uploadFile}) {
   return (
     <nav className='flex fixed justify-center w-full bg-gray-100 px-8 py-2 shadow-md z-10'>
       <button onClick={handleClick} className={`rounded text-white p-4 font-bold inline-block hover:bg-orange-300 ${uploadButtonColor} py-3`}>
-        Upload a file
+        Upload your DPKG file
       </button>
       <input
         type="file"
