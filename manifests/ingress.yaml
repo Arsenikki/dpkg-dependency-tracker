@@ -11,7 +11,8 @@ spec:
     - dpkgviewer.westeurope.cloudapp.azure.com
     secretName: tls-secret
   rules:
-  - http:
+  - host: dpkgviewer.westeurope.cloudapp.azure.com
+    http:
       paths:
       - path: /api/upload
         backend:
@@ -31,7 +32,8 @@ spec:
     - dpkgviewer.westeurope.cloudapp.azure.com
     secretName: tls-secret
   rules:
-  - http:
+  - host: dpkgviewer.westeurope.cloudapp.azure.com
+    http:
       paths:
       - path: /
         backend:
