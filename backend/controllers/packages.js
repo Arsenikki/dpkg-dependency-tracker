@@ -18,7 +18,7 @@ packagesRouter.post('/upload', upload.single('dpkg-file'), async (req, res) => {
   if (userPackages.length >= 1) {
     res.json(userPackages);
   } else {
-    res.send('Failed to process uploaded file:', req.file.filename);
+    res.status(500).send('Failed to process uploaded file:', req.file.filename);
   }
 });
 
@@ -28,7 +28,7 @@ packagesRouter.get('/packages', async (req, res) => {
   if (defaultPackages.length >= 1) {
     res.json(defaultPackages);
   } else {
-    res.send('No packages');
+    res.status(404).send('No default packages found for unknown reason');
   }
 });
 
